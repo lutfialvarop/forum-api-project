@@ -1,4 +1,4 @@
-const ThreadDetail = require("../../Domains/threads/entities/ThreadDetail");
+const ThreadDetail = require('../../Domains/threads/entities/ThreadDetail');
 
 class GetThreadDetailUseCase {
     constructor({ threadRepository, commentRepository, replyRepository }) {
@@ -20,7 +20,7 @@ class GetThreadDetailUseCase {
                     const commentReplies = await this._replyRepository.getRepliesByCommentId(comment.id);
                     replies = commentReplies.map((reply) => ({
                         id: reply.id,
-                        content: reply.is_delete ? "**balasan telah dihapus**" : reply.content,
+                        content: reply.is_delete ? '**balasan telah dihapus**' : reply.content,
                         date: reply.date,
                         username: reply.username,
                     }));
@@ -30,7 +30,7 @@ class GetThreadDetailUseCase {
                     id: comment.id,
                     username: comment.username,
                     date: comment.date,
-                    content: comment.is_delete ? "**komentar telah dihapus**" : comment.content,
+                    content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
                     replies,
                 };
             })
