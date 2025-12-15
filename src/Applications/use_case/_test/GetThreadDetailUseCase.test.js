@@ -2,9 +2,10 @@ const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const GetThreadDetailUseCase = require('../GetThreadDetailUseCase');
+const CommentLikeRepository = require('../../../Domains/likes/CommentLikeRepository');
 
 describe('GetThreadDetailUseCase', () => {
-    it('should orchestrate the get thread detail action correctly with comments and replies', async () => {
+    it('should orchestrate the get thread detail action correctly with comments, replies, and likes', async () => {
         // Arrange
         const useCasePayload = 'thread-123';
 
@@ -43,20 +44,29 @@ describe('GetThreadDetailUseCase', () => {
             },
             {
                 id: 'reply-456',
-                content: 'a deleted reply',
+                content: 'dirty reply',
                 date: '2024-01-01T01:20:00.000Z',
-                username: 'user-a',
+                username: 'user-d',
                 is_delete: true,
+            },
+        ];
+
+        const mockLikeCounts = [
+            {
+                comment_id: 'comment-123',
+                count: '2',
             },
         ];
 
         const mockThreadRepository = new ThreadRepository();
         const mockCommentRepository = new CommentRepository();
         const mockReplyRepository = new ReplyRepository();
+        const mockCommentLikeRepository = new CommentLikeRepository();
 
         mockThreadRepository.verifyThreadAvailability = jest.fn(() => Promise.resolve());
         mockThreadRepository.getThreadById = jest.fn(() => Promise.resolve(mockThread));
         mockCommentRepository.getCommentsByThreadId = jest.fn(() => Promise.resolve(mockComments));
+        mockCommentLikeRepository.getLikeCountsByCommentIds = jest.fn(() => Promise.resolve(mockLikeCounts));
 
         mockReplyRepository.getRepliesByCommentId = jest.fn().mockImplementation(async (commentId) => {
             if (commentId === 'comment-123') {
@@ -69,6 +79,7 @@ describe('GetThreadDetailUseCase', () => {
             threadRepository: mockThreadRepository,
             commentRepository: mockCommentRepository,
             replyRepository: mockReplyRepository,
+            commentLikeRepository: mockCommentLikeRepository,
         });
 
         // Action
@@ -83,6 +94,7 @@ describe('GetThreadDetailUseCase', () => {
                     username: 'user-b',
                     date: '2024-01-01T01:00:00.000Z',
                     content: 'a comment',
+                    likeCount: 2,
                     replies: [
                         {
                             id: 'reply-123',
@@ -94,7 +106,7 @@ describe('GetThreadDetailUseCase', () => {
                             id: 'reply-456',
                             content: '**balasan telah dihapus**',
                             date: '2024-01-01T01:20:00.000Z',
-                            username: 'user-a',
+                            username: 'user-d',
                         },
                     ],
                 },
@@ -103,6 +115,7 @@ describe('GetThreadDetailUseCase', () => {
                     username: 'user-c',
                     date: '2024-01-01T02:00:00.000Z',
                     content: '**komentar telah dihapus**',
+                    likeCount: 0,
                     replies: [],
                 },
             ],
@@ -111,6 +124,7 @@ describe('GetThreadDetailUseCase', () => {
         expect(mockThreadRepository.verifyThreadAvailability).toHaveBeenCalledWith(useCasePayload);
         expect(mockThreadRepository.getThreadById).toHaveBeenCalledWith(useCasePayload);
         expect(mockCommentRepository.getCommentsByThreadId).toHaveBeenCalledWith(useCasePayload);
+        expect(mockCommentLikeRepository.getLikeCountsByCommentIds).toHaveBeenCalledWith(['comment-123', 'comment-456']);
         expect(mockReplyRepository.getRepliesByCommentId).toHaveBeenCalledWith('comment-123');
         expect(mockReplyRepository.getRepliesByCommentId).toHaveBeenCalledWith('comment-456');
     });
