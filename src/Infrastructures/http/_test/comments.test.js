@@ -12,12 +12,20 @@ describe('/comments endpoint', () => {
         await pool.end();
     });
 
-    afterEach(async () => {
+    const cleanDB = async () => {
         await CommentLikesTableTestHelper.cleanTable();
         await CommentsTableTestHelper.cleanTable();
         await ThreadsTableTestHelper.cleanTable();
         await AuthenticationsTableTestHelper.cleanTable();
         await UsersTableTestHelper.cleanTable();
+    };
+
+    beforeAll(async () => {
+        await cleanDB();
+    });
+
+    afterEach(async () => {
+        await cleanDB();
     });
 
     describe('when POST /threads/{threadId}/comments', () => {
