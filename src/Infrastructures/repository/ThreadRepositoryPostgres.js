@@ -1,7 +1,7 @@
-const ThreadRepository = require("../../Domains/threads/ThreadRepository");
-const AddedThread = require("../../Domains/threads/entities/AddedThread");
-const ThreadDetail = require("../../Domains/threads/entities/ThreadDetail");
-const NotFoundError = require("../../Commons/exceptions/NotFoundError");
+const ThreadRepository = require('../../Domains/threads/ThreadRepository');
+const AddedThread = require('../../Domains/threads/entities/AddedThread');
+const ThreadDetail = require('../../Domains/threads/entities/ThreadDetail');
+const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 
 class ThreadRepositoryPostgres extends ThreadRepository {
     constructor(pool, idGenerator) {
@@ -16,7 +16,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
         const date = new Date().toISOString();
 
         const query = {
-            text: "INSERT INTO threads(id, title, body, owner, date) VALUES($1, $2, $3, $4, $5) RETURNING id, title, owner",
+            text: 'INSERT INTO threads(id, title, body, owner, date) VALUES($1, $2, $3, $4, $5) RETURNING id, title, owner',
             values: [id, title, body, owner, date],
         };
 
@@ -27,14 +27,14 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
     async verifyThreadAvailability(threadId) {
         const query = {
-            text: "SELECT id FROM threads WHERE id = $1",
+            text: 'SELECT id FROM threads WHERE id = $1',
             values: [threadId],
         };
 
         const result = await this._pool.query(query);
 
         if (!result.rowCount) {
-            throw new NotFoundError("thread tidak ditemukan");
+            throw new NotFoundError('thread tidak ditemukan');
         }
     }
 
@@ -50,7 +50,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
         const result = await this._pool.query(query);
 
         if (!result.rowCount) {
-            throw new NotFoundError("thread tidak ditemukan");
+            throw new NotFoundError('thread tidak ditemukan');
         }
 
         return result.rows[0];

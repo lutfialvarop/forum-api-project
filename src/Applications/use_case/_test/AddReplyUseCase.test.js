@@ -1,28 +1,28 @@
-const AddReplyUseCase = require("../AddReplyUseCase");
-const AddReply = require("../../../Domains/replies/entities/AddReply");
-const AddedReply = require("../../../Domains/replies/entities/AddedReply");
-const ReplyRepository = require("../../../Domains/replies/ReplyRepository");
-const CommentRepository = require("../../../Domains/comments/CommentRepository");
-const ThreadRepository = require("../../../Domains/threads/ThreadRepository");
+const AddReplyUseCase = require('../AddReplyUseCase');
+const AddReply = require('../../../Domains/replies/entities/AddReply');
+const AddedReply = require('../../../Domains/replies/entities/AddedReply');
+const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
+const CommentRepository = require('../../../Domains/comments/CommentRepository');
+const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 
-describe("AddReplyUseCase", () => {
-    it("should orchestrating the add reply action correctly", async () => {
+describe('AddReplyUseCase', () => {
+    it('should orchestrating the add reply action correctly', async () => {
         // Arrange
         const useCasePayload = {
-            content: "reply content",
-            commentId: "comment-123",
-            threadId: "thread-123",
-            owner: "user-123",
+            content: 'reply content',
+            commentId: 'comment-123',
+            threadId: 'thread-123',
+            owner: 'user-123',
         };
 
         const mockAddedReply = {
-            id: "reply-123",
+            id: 'reply-123',
             content: useCasePayload.content,
             owner: useCasePayload.owner,
         };
 
         const expectedAddedReply = new AddedReply({
-            id: "reply-123",
+            id: 'reply-123',
             content: useCasePayload.content,
             owner: useCasePayload.owner,
         });

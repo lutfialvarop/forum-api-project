@@ -1,8 +1,8 @@
 const AuthTestHelper = {
-    async getAccessToken(server, username = "dicoding", password = "secret") {
+    async getAccessToken(server, username = 'dicoding', password = 'secret') {
         const response = await server.inject({
-            method: "POST",
-            url: "/authentications",
+            method: 'POST',
+            url: '/authentications',
             payload: {
                 username,
                 password,
