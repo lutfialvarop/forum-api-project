@@ -14,12 +14,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Create SSH Key from Base64
+        run: |
+          echo "${{ secrets.SSH_KEY }}" | base64 -d > private_key.pem
+          
+          chmod 600 private_key.pem
+          
+          if [ ! -s private_key.pem ]; then
+            echo "Error: File private_key.pem kosong! Cek kembali GitHub Secret Anda."
+            exit 1
+          fi
+
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key_path: private_key.pem
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ~/forum-api
