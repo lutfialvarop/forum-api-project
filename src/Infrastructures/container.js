@@ -39,6 +39,10 @@ const ReplyRepositoryPostgres = require('./repository/ReplyRepositoryPostgres');
 const AddReplyUseCase = require('../Applications/use_case/AddReplyUseCase');
 const DeleteReplyUseCase = require('../Applications/use_case/DeleteReplyUseCase');
 
+const CommentLikeRepository = require('../Domains/likes/CommentLikeRepository');
+const CommentLikeRepositoryPostgres = require('./repository/CommentLikeRepositoryPostgres');
+const ToggleCommentLikeUseCase = require('../Applications/use_case/ToggleCommentLikeUseCase');
+
 const container = createContainer();
 
 container.register([
@@ -88,6 +92,13 @@ container.register([
     {
         key: ReplyRepository.name,
         Class: ReplyRepositoryPostgres,
+        parameter: {
+            dependencies: [{ concrete: pool }, { concrete: nanoid }],
+        },
+    },
+    {
+        key: CommentLikeRepository.name,
+        Class: CommentLikeRepositoryPostgres,
         parameter: {
             dependencies: [{ concrete: pool }, { concrete: nanoid }],
         },
@@ -156,6 +167,7 @@ container.register([
                 { name: 'threadRepository', internal: ThreadRepository.name },
                 { name: 'commentRepository', internal: CommentRepository.name },
                 { name: 'replyRepository', internal: ReplyRepository.name },
+                { name: 'commentLikeRepository', internal: CommentLikeRepository.name },
             ],
         },
     },
@@ -202,6 +214,18 @@ container.register([
                 { name: 'replyRepository', internal: ReplyRepository.name },
                 { name: 'commentRepository', internal: CommentRepository.name },
                 { name: 'threadRepository', internal: ThreadRepository.name },
+            ],
+        },
+    },
+    {
+        key: ToggleCommentLikeUseCase.name,
+        Class: ToggleCommentLikeUseCase,
+        parameter: {
+            injectType: 'destructuring',
+            dependencies: [
+                { name: 'commentLikeRepository', internal: CommentLikeRepository.name },
+                { name: 'threadRepository', internal: ThreadRepository.name },
+                { name: 'commentRepository', internal: CommentRepository.name },
             ],
         },
     },
