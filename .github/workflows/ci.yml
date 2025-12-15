@@ -1,0 +1,74 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: forumapi_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create test database config
+        run: |
+          mkdir -p config/database
+          cat > config/database/test.json << EOF
+          {
+            "host": "localhost",
+            "port": 5432,
+            "user": "postgres",
+            "password": "postgres",
+            "database": "forumapi_test"
+          }
+          EOF
+
+      - name: Run database migrations
+        run: npm run migrate:test up
+        env:
+          PGHOST_TEST: localhost
+          PGUSER_TEST: postgres
+          PGDATABASE_TEST: forumapi_test
+          PGPASSWORD_TEST: postgres
+          PGPORT_TEST: 5432
+
+      - name: Run all tests
+        run: npm test
+        env:
+          PGHOST_TEST: localhost
+          PGUSER_TEST: postgres
+          PGDATABASE_TEST: forumapi_test
+          PGPASSWORD_TEST: postgres
+          PGPORT_TEST: 5432
+          ACCESS_TOKEN_KEY: ${{ secrets.ACCESS_TOKEN_KEY }}
+          REFRESH_TOKEN_KEY: ${{ secrets.REFRESH_TOKEN_KEY }}
+          ACCESS_TOKEN_AGE: 3000
